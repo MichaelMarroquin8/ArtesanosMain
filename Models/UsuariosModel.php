@@ -9,6 +9,7 @@ class UsuariosModel extends Mysql
 	private $intTelefono;
 	private $strEmail;
 	private $strPassword;
+	private $strDescription;
 	private $strToken;
 	private $intTipoId;
 	private $intStatus;
@@ -23,7 +24,7 @@ class UsuariosModel extends Mysql
 		parent::__construct();
 	}
 
-	public function insertUsuario(string $identificacion, string $nombre, string $apellido, int $telefono, string $email, string $password, int $tipoid, int $status,  string $portada, string $ruta)
+	public function insertUsuario(string $identificacion, string $nombre, string $apellido, string $descripcion, int $telefono, string $email, string $password, int $tipoid, int $status,  string $portada, string $ruta)
 	{
 
 		$this->strIdentificacion = $identificacion;
@@ -32,6 +33,7 @@ class UsuariosModel extends Mysql
 		$this->intTelefono = $telefono;
 		$this->strEmail = $email;
 		$this->strPassword = $password;
+		$this->strDescription = $descripcion;
 		$this->intTipoId = $tipoid;
 		$this->intStatus = $status;
 		$this->strPortada = $portada;
@@ -43,12 +45,13 @@ class UsuariosModel extends Mysql
 		$request = $this->select_all($sql);
 
 		if (empty($request)) {
-			$query_insert  = "INSERT INTO persona(identificacion,nombres,apellidos,telefono,email_user,password,rolid,status,portada,ruta) 
-								  VALUES(?,?,?,?,?,?,?,?,?,?)";
+			$query_insert  = "INSERT INTO persona(identificacion,nombres,apellidos,descripcion,telefono,email_user,password,rolid,status,portada,ruta) 
+								  VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 			$arrData = array(
 				$this->strIdentificacion,
 				$this->strNombre,
 				$this->strApellido,
+				$this->strDescription,
 				$this->intTelefono,
 				$this->strEmail,
 				$this->strPassword,
@@ -64,34 +67,7 @@ class UsuariosModel extends Mysql
 		}
 		return $return;
 	}
-
-	public function selectUsuarios()
-	{
-		$whereAdmin = "";
-		if ($_SESSION['idUser'] != 1) {
-			$whereAdmin = " and p.idpersona != 1 ";
-		}
-		$sql = "SELECT p.idpersona,p.identificacion,p.nombres,p.apellidos,p.telefono,p.email_user,p.status,r.idrol,r.nombrerol 
-					FROM persona p 
-					INNER JOIN rol r
-					ON p.rolid = r.idrol
-					WHERE p.status != 0 " . $whereAdmin;
-		$request = $this->select_all($sql);
-		return $request;
-	}
-	public function selectUsuario(int $idpersona)
-	{
-		$this->intIdUsuario = $idpersona;
-		$sql = "SELECT p.idpersona,p.identificacion,p.nombres,p.apellidos,p.telefono,p.email_user,p.nit,p.nombrefiscal,p.direccionfiscal,r.idrol,r.nombrerol,p.status, DATE_FORMAT(p.datecreated, '%d-%m-%Y') as fechaRegistro 
-					FROM persona p
-					INNER JOIN rol r
-					ON p.rolid = r.idrol
-					WHERE p.idpersona = $this->intIdUsuario";
-		$request = $this->select($sql);
-		return $request;
-	}
-
-	public function updateUsuario(int $idUsuario, string $identificacion, string $nombre, string $apellido, int $telefono, string $email, string $password, int $tipoid, int $status)
+	public function updateUsuario(int $idUsuario, string $identificacion, string $nombre, string $apellido, string $descripcion, int $telefono, string $email, string $password, int $tipoid, int $status,  string $portada, string $ruta)
 	{
 
 		$this->intIdUsuario = $idUsuario;
@@ -101,8 +77,11 @@ class UsuariosModel extends Mysql
 		$this->intTelefono = $telefono;
 		$this->strEmail = $email;
 		$this->strPassword = $password;
+		$this->strDescription = $descripcion;
 		$this->intTipoId = $tipoid;
 		$this->intStatus = $status;
+		$this->strPortada = $portada;
+		$this->strRuta = $ruta;
 
 		$sql = "SELECT * FROM persona WHERE (email_user = '{$this->strEmail}' AND idpersona != $this->intIdUsuario)
 										  OR (identificacion = '{$this->strIdentificacion}' AND idpersona != $this->intIdUsuario) ";
@@ -110,29 +89,35 @@ class UsuariosModel extends Mysql
 
 		if (empty($request)) {
 			if ($this->strPassword  != "") {
-				$sql = "UPDATE persona SET identificacion=?, nombres=?, apellidos=?, telefono=?, email_user=?, password=?, rolid=?, status=? 
+				$sql = "UPDATE persona SET identificacion=?, nombres=?, apellidos=?, descripcion=?, telefono=?, email_user=?, password=?, rolid=?, status=?, portada=?, ruta=?
 							WHERE idpersona = $this->intIdUsuario ";
 				$arrData = array(
 					$this->strIdentificacion,
 					$this->strNombre,
 					$this->strApellido,
+					$this->strDescription,
 					$this->intTelefono,
 					$this->strEmail,
 					$this->strPassword,
 					$this->intTipoId,
-					$this->intStatus
+					$this->intStatus,
+					$this->strPortada,
+					$this->strRuta,
 				);
 			} else {
-				$sql = "UPDATE persona SET identificacion=?, nombres=?, apellidos=?, telefono=?, email_user=?, rolid=?, status=? 
+				$sql = "UPDATE persona SET identificacion=?, nombres=?, apellidos=?,descripcion=?, telefono=?, email_user=?, rolid=?, status=?, portada=?, ruta=?
 							WHERE idpersona = $this->intIdUsuario ";
 				$arrData = array(
 					$this->strIdentificacion,
 					$this->strNombre,
 					$this->strApellido,
+					$this->strDescription,
 					$this->intTelefono,
 					$this->strEmail,
 					$this->intTipoId,
-					$this->intStatus
+					$this->intStatus,
+					$this->strPortada,
+					$this->strRuta,
 				);
 			}
 			$request = $this->update($sql, $arrData);
@@ -180,6 +165,31 @@ class UsuariosModel extends Mysql
 			);
 		}
 		$request = $this->update($sql, $arrData);
+		return $request;
+	}
+	public function selectUsuarios()
+	{
+		$whereAdmin = "";
+		if ($_SESSION['idUser'] != 1) {
+			$whereAdmin = " and p.idpersona != 1 ";
+		}
+		$sql = "SELECT p.idpersona,p.identificacion,p.nombres,p.apellidos,p.telefono,p.email_user,p.status,r.idrol,r.nombrerol 
+					FROM persona p 
+					INNER JOIN rol r
+					ON p.rolid = r.idrol
+					WHERE p.status != 0 " . $whereAdmin;
+		$request = $this->select_all($sql);
+		return $request;
+	}
+	public function selectUsuario(int $idpersona)
+	{
+		$this->intIdUsuario = $idpersona;
+		$sql = "SELECT p.idpersona,p.identificacion,p.nombres,p.apellidos,p.telefono,p.email_user,p.nit,p.nombrefiscal,p.descripcion,p.direccionfiscal,r.idrol,r.nombrerol,p.status, DATE_FORMAT(p.datecreated, '%d-%m-%Y') as fechaRegistro 
+					FROM persona p
+					INNER JOIN rol r
+					ON p.rolid = r.idrol
+					WHERE p.idpersona = $this->intIdUsuario";
+		$request = $this->select($sql);
 		return $request;
 	}
 

@@ -28,13 +28,14 @@ class Usuarios extends Controllers
 	public function setUsuario()
 	{
 		if ($_POST) {
-			if (empty($_POST['txtIdentificacion']) || empty($_POST['txtNombre']) || empty($_POST['txtApellido']) || empty($_POST['txtTelefono']) || empty($_POST['txtEmail']) || empty($_POST['listRolid']) || empty($_POST['listStatus'])) {
+			if (empty($_POST['txtIdentificacion']) || empty($_POST['txtNombre']) || empty($_POST['txtApellido']) || empty($_POST['txtTelefono']) || empty($_POST['txtEmail'])  || empty($_POST['listRolid']) || empty($_POST['listStatus'])) {
 				$arrResponse = array("status" => false, "msg" => 'Datos incorrectos.');
 			} else {
 				$idUsuario = intval($_POST['idUsuario']);
 				$strIdentificacion = strClean($_POST['txtIdentificacion']);
 				$strNombre = ucwords(strClean($_POST['txtNombre']));
 				$strApellido = ucwords(strClean($_POST['txtApellido']));
+				$strDescription = strtolower(strClean($_POST['txtDescription']));
 				$intTelefono = intval(strClean($_POST['txtTelefono']));
 				$strEmail = strtolower(strClean($_POST['txtEmail']));
 				$intTipoId = intval(strClean($_POST['listRolid']));
@@ -42,11 +43,9 @@ class Usuarios extends Controllers
 
 				$ruta = strtolower(clear_cadena($strNombre));
 				$ruta = str_replace(" ", "-", $ruta);
-
 				$foto   	 	= $_FILES['foto'];
 				$nombre_foto 	= $foto['name'];
-				$type 		 	= $foto['type'];
-				$url_temp    	= $foto['tmp_name'];
+				
 				$imgPortada 	= 'portada_categoria.png';
 				if ($nombre_foto != '') {
 					$imgPortada = 'img_' . md5(date('d-m-Y H:i:s')) . '.jpg';
@@ -62,6 +61,7 @@ class Usuarios extends Controllers
 							$strIdentificacion,
 							$strNombre,
 							$strApellido,
+							$strDescription,
 							$intTelefono,
 							$strEmail,
 							$strPassword,
@@ -80,11 +80,14 @@ class Usuarios extends Controllers
 							$strIdentificacion,
 							$strNombre,
 							$strApellido,
+							$strDescription,
 							$intTelefono,
 							$strEmail,
 							$strPassword,
 							$intTipoId,
-							$intStatus
+							$intStatus,
+							$imgPortada,
+							$ruta,
 						);
 					}
 				}
