@@ -63,32 +63,56 @@ class DashboardModel extends Mysql
 		$rolid = $_SESSION['userData']['idrol'];
 		$idUser = $_SESSION['userData']['idpersona'];
 		$where = "";
+
 		if ($rolid == RARTESANO) {
-			$where = " WHERE p.personaid = " . $idUser;
+			// Filtrar pedidos que tienen al menos un producto del artesano
+			$where = " WHERE p.idpedido IN (
+						SELECT dp.pedidoid
+						FROM detalle_pedido dp
+						INNER JOIN producto prod ON dp.productoid = prod.idproducto
+						WHERE prod.personaid = " . $idUser . "
+					  )";
 		}
 
 		$sql = "SELECT p.idpedido, CONCAT(pr.nombres,' ',pr.apellidos) as nombre, p.monto, p.status 
 					FROM pedido p
-					INNER JOIN persona pr
-					ON p.personaid = pr.idpersona
+					INNER JOIN persona pr ON p.personaid = pr.idpersona
 					$where
-					ORDER BY p.idpedido DESC LIMIT 10 ";
+					ORDER BY p.idpedido DESC LIMIT 10";
+
 		$request = $this->select_all($sql);
 		return $request;
 	}
+
 	public function selectPagosMes(int $anio, int $mes)
 	{
+		$rolid = $_SESSION['userData']['idrol'];
+		$idUser = $_SESSION['userData']['idpersona'];
+		$where = "WHERE MONTH(p.fecha) = $mes AND YEAR(p.fecha) = $anio";
+
+		if ($rolid == RARTESANO) {
+			// Filtrar pagos que tienen al menos un producto del artesano
+			$where .= " AND p.idpedido IN (
+						SELECT dp.pedidoid
+						FROM detalle_pedido dp
+						INNER JOIN producto prod ON dp.productoid = prod.idproducto
+						WHERE prod.personaid = " . $idUser . "
+					  )";
+		}
 
 		$sql = "SELECT p.tipopagoid, tp.tipopago, COUNT(p.tipopagoid) as cantidad, SUM(p.monto) as total 
 					FROM pedido p 
 					INNER JOIN tipopago tp 
 					ON p.tipopagoid = tp.idtipopago 
-					WHERE MONTH(p.fecha) = $mes AND YEAR(p.fecha) = $anio GROUP BY tipopagoid";
+					$where 
+					GROUP BY tipopagoid";
+
 		$pagos = $this->select_all($sql);
 		$meses = Meses();
 		$arrData = array('anio' => $anio, 'mes' => $meses[intval($mes - 1)], 'tipospago' => $pagos);
 		return $arrData;
 	}
+
 	public function selectVentasMes(int $anio, int $mes)
 	{
 		$rolid = $_SESSION['userData']['idrol'];
@@ -151,18 +175,17 @@ class DashboardModel extends Mysql
 		$rolid = $_SESSION['userData']['idrol'];
 		$idUser = $_SESSION['userData']['idpersona'];
 		$where = "";
-		
+
 		if ($rolid == RARTESANO) {
 			$where = "WHERE status = 1 AND personaid = " . intval($idUser); // Sanitizar $idUser
 		}
-	
+
 		// Construir la consulta SQL con espacios adecuados
 		$sql = "SELECT * FROM producto " . $where . " ORDER BY idproducto DESC LIMIT 10";
-		
+
 		// Ejecutar la consulta
 		$request = $this->select_all($sql);
-	
+
 		return $request;
 	}
-	
 }

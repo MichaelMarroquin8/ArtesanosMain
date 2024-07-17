@@ -24,7 +24,7 @@ class Productos extends Controllers
 		$data['page_functions_js'] = "functions_productos.js";
 		$this->views->getView($this, "productos", $data);
 	}
-
+	
 	public function getProductos()
 	{
 		if ($_SESSION['permisosMod']['r']) {
@@ -33,19 +33,19 @@ class Productos extends Controllers
 				$btnView = '';
 				$btnEdit = '';
 				$btnDelete = '';
-
+	
 				if ($arrData[$i]['status'] == 1) {
 					$arrData[$i]['status'] = '<span class="badge badge-success">Activo</span>';
 				} else {
 					$arrData[$i]['status'] = '<span class="badge badge-danger">Inactivo</span>';
 				}
-
+	
 				$arrData[$i]['precio'] = SMONEY . ' ' . formatMoney($arrData[$i]['precio']);
 				if ($_SESSION['permisosMod']['r']) {
 					$btnView = '<button class="btn btn-info btn-sm" onClick="fntViewInfo(' . $arrData[$i]['idproducto'] . ')" title="Ver producto"><i class="far fa-eye"></i></button>';
 				}
 				if ($_SESSION['permisosMod']['u']) {
-					$btnEdit = '<button class="btn btn-primary  btn-sm" onClick="fntEditInfo(this,' . $arrData[$i]['idproducto'] . ')" title="Editar producto"><i class="fas fa-pencil-alt"></i></button>';
+					$btnEdit = '<button class="btn btn-primary btn-sm" onClick="fntEditInfo(this,' . $arrData[$i]['idproducto'] . ')" title="Editar producto"><i class="fas fa-pencil-alt"></i></button>';
 				}
 				if ($_SESSION['permisosMod']['d']) {
 					$btnDelete = '<button class="btn btn-danger btn-sm" onClick="fntDelInfo(' . $arrData[$i]['idproducto'] . ')" title="Eliminar producto"><i class="far fa-trash-alt"></i></button>';

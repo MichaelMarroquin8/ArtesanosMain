@@ -1,6 +1,6 @@
 
 <?php
-const BASE_URL = "http://localhost/artesanos2";
+const BASE_URL = "http://localhost/ARTESANOSMAIN";
 //const BASE_URL = "https://artesanos.senacgts.org";
 
 //Zona horaria
