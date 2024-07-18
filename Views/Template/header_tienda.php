@@ -39,7 +39,7 @@ $infoPreguntas = !empty(getInfoPage(PPREGUNTAS)) ? getInfoPage(PPREGUNTAS)['cont
 	<meta property="og:image" content="<?= $urlImg; ?>" />
 
 	<!--===============================================================================================-->
-	<link rel="icon" type="image/png" href="<?= media() ?>/tienda/images/favicon.ico" />
+	<link rel="icon" type="image/png" href="<?= media() ?>/tienda/images/favicon.png" />
 	<!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="<?= media() ?>/tienda/vendor/bootstrap/css/bootstrap.min.css">
 	<!--===============================================================================================-->
